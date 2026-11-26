@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap — منصة تبادل المهارات</title>
+  <style>
+    :root {
+      --primary: #1d4ed8;
+      --primary-dark: #1e3a8a;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0 16px 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #fff;
+      padding: 20px 24px;
+      border-radius: 0 0 16px 16px;
+      max-width: 1050px;
+      margin: 0 auto 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 6px 18px rgba(29, 78, 216, 0.18);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .user-badge {
+      background: rgba(255, 255, 255, 0.16);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input, select {
+      flex: 1 1 150px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button {
+      padding: 9px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    button.secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: var(--success-bg);
+      color: var(--success-text);
+      font-weight: 600;
+    }
+
+    .toast {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    pre {
+      display: none;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: left;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    pre.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SkillSwap</h1>
+      <p>منصة تبادل المهارات والخدمات</p>
+    </div>
+    <div class="user-badge" id="currentUserBadge">المستخدم النشط: #1</div>
+  </header>
+
+  <div class="container">
+    <!-- الحسابات -->
+    <div class="card">
+      <h2>الحساب والدخول (Auth)</h2>
+      <div class="form-row">
+        <input id="authName" type="text" placeholder="الاسم الكامل (لإنشاء حساب)" />
+        <input id="authEmail" type="email" placeholder="البريد الإلكتروني" />
+        <input id="authPassword" type="password" placeholder="كلمة المرور" />
+        <button onclick="registerUser()">إنشاء حساب</button>
+        <button class="secondary" onclick="loginUser()">تسجيل دخول</button>
+      </div>
+      <div class="form-row">
+        <input id="activeUserId" type="number" min="1" value="1" placeholder="تعيين رقم المستخدم يدويًا" />
+        <button class="secondary" onclick="setActiveUser()">اعتماد الرقم</button>
+      </div>
+      <div class="toast" id="authStatus">يمكنك استخدام الحساب الحالي (#1) أو تسجيل دخول بحسابك.</div>
+    </div>
+
+    <div class="grid-2">
+      <!-- الخدمات -->
+      <div class="card">
+        <h2>الخدمات (Services)</h2>
+        <div class="form-row">
+          <input id="srvTitle" type="text" placeholder="عنوان الخدمة" />
+          <input id="srvDesc" type="text" placeholder="وصف مختصر للخدمة" />
+        </div>
+        <div class="form-row">
+          <button onclick="addService()">إضافة خدمة</button>
+          <button class="secondary" onclick="loadServices()">تحديث القائمة</button>
+        </div>
+        <div class="list" id="servicesList"></div>
+      </div>
+
+      <!-- المقايضات -->
+      <div class="card">
+        <h2>المقايضات (Swaps)</h2>
+        <div class="form-row">
+          <input id="swapTargetId" type="number" min="1" value="1" placeholder="رقم الخدمة المطلوبة" />
+          <input id="swapProviderId" type="number" min="1" value="1" placeholder="رقم مزود الخدمة" />
+        </div>
+        <div class="form-row">
+          <input id="swapNotes" type="text" placeholder="ملاحظات المقايضة" />
+          <button onclick="addSwap()">إرسال طلب</button>
+          <button class="secondary" onclick="loadSwaps()">تحديث</button>
+        </div>
+        <div class="list" id="swapsList"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- الرسائل -->
+      <div class="card">
+        <h2>الرسائل (Messages)</h2>
+        <div class="form-row">
+          <input id="msgSwapId" type="number" min="1" value="1" placeholder="رقم المقايضة" />
+          <input id="msgContent" type="text" placeholder="اكتب رسالتك هنا..." />
+        </div>
+        <div class="form-row">
+          <button onclick="sendMessage()">إرسال رسالة</button>
+          <button class="secondary" onclick="loadMessages()">عرض الرسائل</button>
+        </div>
+        <div class="list" id="messagesList"></div>
+      </div>
+
+      <!-- التقييمات -->
+      <div class="card">
+        <h2>التقييمات (Reviews)</h2>
+        <div class="form-row">
+          <input id="revSwapId" type="number" min="1" value="1" placeholder="رقم المقايضة" />
+          <input id="revReviewedId" type="number" min="1" value="1" placeholder="رقم المستخدم المقيَّم" />
+          <input id="revRating" type="number" min="1" max="5" value="5" placeholder="التقييم (1-5)" />
+        </div>
+        <div class="form-row">
+          <input id="revComment" type="text" placeholder="تعليقك على التجربة" />
+          <button onclick="addReview()">إضافة تقييم</button>
+          <button class="secondary" onclick="loadReviews()">عرض التقييمات</button>
+        </div>
+        <div class="list" id="reviewsList"></div>
+      </div>
+    </div>
+
+    <!-- أداة فحص تقنية مخفية افتراضياً -->
+    <div class="card">
+      <button class="secondary" onclick="toggleDebug()">إظهار / إخفاء استجابة الـ API التقنية</button>
+      <pre id="output">Ready...</pre>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://localhost:5000/api";
+    let currentUserId = 1;
+
+    function getUserId() {
+      return Number(document.getElementById("activeUserId").value) || currentUserId || 1;
+    }
+
+    function updateBadge(labelText) {
+      currentUserId = getUserId();
+      document.getElementById("currentUserBadge").textContent =
+        labelText || `المستخدم النشط: #${currentUserId}`;
+    }
+
+    function setActiveUser() {
+      updateBadge();
+      document.getElementById("authStatus").textContent = `تم اعتماد المستخدم رقم #${currentUserId}.`;
+    }
+
+    function showLog(data) {
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+
+    function toggleDebug() {
+      document.getElementById("output").classList.toggle("show");
+    }
+
+    async function registerUser() {
+      const body = {
+        name: document.getElementById("authName").value.trim(),
+        email: document.getElementById("authEmail").value.trim(),
+        password: document.getElementById("authPassword").value
+      };
+      const res = await fetch(`${API}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      if (data.id || data.user?.id) {
+        const id = data.id || data.user.id;
+        document.getElementById("activeUserId").value = id;
+        updateBadge(`${data.name || data.user?.name || "مستخدم"} (#${id})`);
+        document.getElementById("authStatus").textContent = "تم إنشاء الحساب وتسجيل الدخول بنجاح.";
+      } else {
+        document.getElementById("authStatus").textContent = data.message || "تحقق من البيانات المدخلة.";
+      }
+    }
+
+    async function loginUser() {
+      const body = {
+        email: document.getElementById("authEmail").value.trim(),
+        password: document.getElementById("authPassword").value
+      };
+      const res = await fetch(`${API}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      if (data.user?.id || data.id) {
+        const id = data.user?.id || data.id;
+        const name = data.user?.name || data.name || "مستخدم";
+        document.getElementById("activeUserId").value = id;
+        updateBadge(`${name} (#${id})`);
+        document.getElementById("authStatus").textContent = `تم تسجيل الدخول كـ ${name}.`;
+      } else {
+        document.getElementById("authStatus").textContent = data.message || "بيانات الدخول غير صحيحة.";
+      }
+    }
+
+    async function loadServices() {
+      const res = await fetch(`${API}/services`);
+      const data = await res.json();
+      const box = document.getElementById("servicesList");
+      box.innerHTML = Array.isArray(data) && data.length
+        ? data.map(s => `
+            <div class="item">
+              <strong>#${s.id} — ${s.title || "بدون عنوان"}</strong>
+              <div>${s.description || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="item">لا توجد خدمات معروضة حالياً.</div>`;
+      showLog(data);
+    }
+
+    async function addService() {
+      const body = {
+        user_id: getUserId(),
+        title: document.getElementById("srvTitle").value.trim(),
+        description: document.getElementById("srvDesc").value.trim()
+      };
+      const res = await fetch(`${API}/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      document.getElementById("srvTitle").value = "";
+      document.getElementById("srvDesc").value = "";
+      await loadServices();
+    }
+
+    async function loadSwaps() {
+      const res = await fetch(`${API}/swaps`);
+      const data = await res.json();
+      const box = document.getElementById("swapsList");
+      box.innerHTML = Array.isArray(data) && data.length
+        ? data.map(sw => `
+            <div class="item">
+              <strong>مقايضة #${sw.id}</strong>
+              <span class="status-pill">${sw.status || "pending"}</span>
+              <div>من مستخدم #${sw.requester_id} إلى #${sw.provider_id}</div>
+              <div>${sw.notes || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="item">لا توجد مقايضات حالياً.</div>`;
+      showLog(data);
+    }
+
+    async function addSwap() {
+      const targetId = Number(document.getElementById("swapTargetId").value);
+      const body = {
+        target_service_id: targetId,
+        offered_service_id: targetId,
+        requester_id: getUserId(),
+        provider_id: Number(document.getElementById("swapProviderId").value),
+        swap_type: "skill",
+        notes: document.getElementById("swapNotes").value.trim()
+      };
+      const res = await fetch(`${API}/swaps`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      document.getElementById("swapNotes").value = "";
+      await loadSwaps();
+    }
+
+    async function loadMessages() {
+      const swapId = Number(document.getElementById("msgSwapId").value) || 1;
+      const res = await fetch(`${API}/messages/swap/${swapId}`);
+      const data = await res.json();
+      const box = document.getElementById("messagesList");
+      box.innerHTML = Array.isArray(data) && data.length
+        ? data.map(m => `
+            <div class="item">
+              <strong>مرسل #${m.sender_id}:</strong> ${m.content}
+            </div>
+          `).join("")
+        : `<div class="item">لا توجد رسائل لهذه المقايضة.</div>`;
+      showLog(data);
+    }
+
+    async function sendMessage() {
+      const body = {
+        swap_id: Number(document.getElementById("msgSwapId").value),
+        sender_id: getUserId(),
+        content: document.getElementById("msgContent").value.trim()
+      };
+      const res = await fetch(`${API}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      document.getElementById("msgContent").value = "";
+      await loadMessages();
+    }
+
+    async function loadReviews() {
+      const userId = Number(document.getElementById("revReviewedId").value) || 1;
+      const res = await fetch(`${API}/reviews/user/${userId}`);
+      const data = await res.json();
+      const box = document.getElementById("reviewsList");
+      box.innerHTML = Array.isArray(data) && data.length
+        ? data.map(r => `
+            <div class="item">
+              <strong>تقييم ${r.rating}/5</strong> — ${r.comment || "بدون تعليق"}
+            </div>
+          `).join("")
+        : `<div class="item">لا توجد تقييمات لهذا المستخدم.</div>`;
+      showLog(data);
+    }
+
+    async function addReview() {
+      const body = {
+        swap_id: Number(document.getElementById("revSwapId").value),
+        reviewer_id: getUserId(),
+        reviewed_user_id: Number(document.getElementById("revReviewedId").value),
+        rating: Number(document.getElementById("revRating").value),
+        comment: document.getElementById("revComment").value.trim()
+      };
+      const res = await fetch(`${API}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      showLog(data);
+      document.getElementById("revComment").value = "";
+      await loadReviews();
+    }
+
+    updateBadge();
+    loadServices();
+    loadSwaps();
+  </script>
+</body>
+</html>
