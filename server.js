@@ -1,13 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./config/db');
+const db = require('./db');
 
-const authRoutes = require('./routes/auth');
-const serviceRoutes = require('./routes/services');
-const swapRoutes = require('./routes/swaps');
-const messageRoutes = require('./routes/messages');
-const reviewRoutes = require('./routes/reviews');
+const authRoutes = require('./auth');
+const serviceRoutes = require('./services');
+const swapRoutes = require('./swaps');
+const messageRoutes = require('./messages');
+const reviewRoutes = require('./reviews');
 
 const app = express();
 app.use(cors());
